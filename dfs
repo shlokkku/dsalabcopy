@@ -1,0 +1,102 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+// Structure to represent a node in the adjacency list
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// Structure to represent the adjacency list for a graph
+struct Graph {
+    int V; // Number of vertices
+    struct Node** adjList; // Array of pointers to adjacency lists
+};
+
+// Function to create a new node with the given data
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to create a graph with V vertices
+struct Graph* createGraph(int V) {
+    struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
+    graph->V = V;
+    graph->adjList = (struct Node**)malloc(V * sizeof(struct Node*));
+
+    for (int i = 0; i < V; i++) {
+        graph->adjList[i] = NULL;
+    }
+
+    return graph;
+}
+
+// Function to add an edge from vertex u to vertex v
+void addEdge(struct Graph* graph, int u, int v) {
+    struct Node* newNode = createNode(v);
+    newNode->next = graph->adjList[u];
+    graph->adjList[u] = newNode;
+}
+
+// Function to perform Depth-First Search (DFS) starting from vertex v
+void DFS(struct Graph* graph, int v, bool visited[]) {
+    visited[v] = true;
+    printf("%d ", v);
+
+    struct Node* current = graph->adjList[v];
+    while (current != NULL) {
+        if (!visited[current->data]) {
+            DFS(graph, current->data, visited);
+        }
+        current = current->next;
+    }
+}
+
+int main() {
+    int V, u, v, startVertex;
+    printf("Enter the number of vertices in the graph: ");
+    scanf("%d", &V);
+
+    struct Graph* graph = createGraph(V);
+
+    while (1) {
+        int choice;
+        printf("\nGraph Operations\n");
+        printf("1. Add Edge\n");
+        printf("2. Depth-First Search (DFS)\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter edge (u v): ");
+                scanf("%d %d", &u, &v);
+                addEdge(graph, u, v);
+                break;
+            case 2:
+                printf("Enter the starting vertex for DFS: ");
+                scanf("%d", &startVertex);
+                bool* visited = (bool*)malloc(V * sizeof(bool));
+                for (int i = 0; i < V; i++) {
+                    visited[i] = false;
+                }
+                printf("Depth-First Search starting from vertex %d: ", startVertex);
+                DFS(graph, startVertex, visited);
+                printf("\n");
+                free(visited);
+                break;
+            case 3:
+                exit(0);
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
